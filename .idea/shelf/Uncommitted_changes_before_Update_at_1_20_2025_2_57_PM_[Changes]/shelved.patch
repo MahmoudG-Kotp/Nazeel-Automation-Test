@@ -1,0 +1,1653 @@
+Index: .idea/modules.xml
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+deleted file mode 100644
+--- a/.idea/modules.xml	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
++++ /dev/null	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectModuleManager">
+-    <modules>
+-      <module fileurl="file://$PROJECT_DIR$/nazeel_automation_test.iml" filepath="$PROJECT_DIR$/nazeel_automation_test.iml" />
+-    </modules>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: nazeel_automation_test.iml
+===================================================================
+diff --git a/nazeel_automation_test.iml b/nazeel_automation_test.iml
+deleted file mode 100644
+--- a/nazeel_automation_test.iml	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
++++ /dev/null	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
+@@ -1,16 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module external.linked.project.id="$MODULE_DIR$/pom.xml" external.system.module.type="SINGLE_MODULE" external.system.module.version="223-2" org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21">
+-    <output url="file://$MODULE_DIR$/target/classes" />
+-    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+-    <content url="file://$MODULE_DIR$">
+-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+-      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+-      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+-      <excludeFolder url="file://$MODULE_DIR$/target" />
+-    </content>
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: src/test/java/nazeel/Hooks.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/Hooks.java b/src/test/java/nazeel/Hooks.java
+new file mode 100644
+--- /dev/null	(date 1737209636346)
++++ b/src/test/java/nazeel/Hooks.java	(date 1737209636346)
+@@ -0,0 +1,116 @@
++package nazeel;
++
++import io.github.bonigarcia.wdm.WebDriverManager;
++import org.openqa.selenium.WebDriver;
++import org.openqa.selenium.chrome.ChromeDriver;
++import org.openqa.selenium.support.ui.WebDriverWait;
++import org.testng.annotations.AfterMethod;
++import org.testng.annotations.AfterTest;
++import org.testng.annotations.BeforeMethod;
++import org.testng.annotations.BeforeTest;
++
++import java.time.Duration;
++import java.util.ArrayList;
++
++/**
++ * The Hooks class handles browser setup and teardown for the tests,
++ * as well as providing utility methods for browser interactions.
++ */
++public class Hooks {
++
++    /**
++     * Runs before each test method to initialize the browser.
++     */
++    @BeforeTest
++    public void openBrowser() {
++        Browser.open();
++    }
++
++    /**
++     * Runs after each test method to clean up and close the browser.
++     *
++     * @throws InterruptedException if interrupted during wait before quitting the browser.
++     */
++    @AfterTest
++    public void closeBrowser() throws InterruptedException {
++        Browser.quit();
++    }
++
++    /**
++     * Nested static class to manage browser-related utilities and driver instance.
++     */
++    public static class Browser {
++        private static WebDriver mainDriver;
++
++        /**
++         * Returns the current WebDriver instance.
++         *
++         * @return The WebDriver instance in use.
++         */
++        public static WebDriver getDriver() {
++            return mainDriver;
++        }
++
++        /**
++         * Opens the browser, sets up WebDriver, and maximizes the window.
++         */
++        private static void open() {
++            // Set up the WebDriver
++            WebDriverManager.chromedriver().setup();
++            mainDriver = new ChromeDriver();
++            // Maximize the browser window
++            mainDriver.manage().window().maximize();
++            // Wait for the browser to be ready by ensuring a window handle exists
++            explicitWait(3).until(driver -> !mainDriver.getWindowHandles().isEmpty());
++        }
++
++        /**
++         * Switches to a browser window by index.
++         *
++         * @param windowIndex The index of the window to switch to.
++         * @return The WebDriver instance focused on the desired window.
++         */
++        public static WebDriver switchTo(int windowIndex) {
++            return mainDriver.switchTo().window(new ArrayList<>(mainDriver.getWindowHandles()).get(windowIndex));
++        }
++
++        /**
++         * Sets an implicit wait for the WebDriver.
++         *
++         * @param seconds The duration of the implicit wait in seconds.
++         */
++        public static void implicitWait(int seconds) {
++            mainDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
++        }
++
++        /**
++         * Creates and returns a WebDriverWait instance for explicit waits.
++         *
++         * @param seconds The duration of the explicit wait in seconds.
++         * @return A WebDriverWait instance.
++         */
++        public static WebDriverWait explicitWait(int seconds) {
++            return new WebDriverWait(mainDriver, Duration.ofSeconds(seconds));
++        }
++
++        /**
++         * Closes a specific browser window by index and switches back to the previous window.
++         *
++         * @param windowIndex The index of the window to close.
++         */
++        public static void closeWindow(int windowIndex) {
++            switchTo(windowIndex).close();
++            switchTo(windowIndex - 1); // Switch back to the previous window
++        }
++
++        /**
++         * Quits the browser after a short wait to ensure cleanup is complete.
++         *
++         * @throws InterruptedException if interrupted during the wait.
++         */
++        private static void quit() throws InterruptedException {
++            Thread.sleep(2000); // Wait for 2 seconds before quitting
++            mainDriver.quit();
++        }
++    }
++}
+Index: src/test/java/nazeel/pages/P03_Reservation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/pages/P03_Reservation.java b/src/test/java/nazeel/pages/P03_Reservation.java
+new file mode 100644
+--- /dev/null	(date 1737376848569)
++++ b/src/test/java/nazeel/pages/P03_Reservation.java	(date 1737376848569)
+@@ -0,0 +1,358 @@
++package nazeel.pages;
++
++import nazeel.Hooks;
++import org.openqa.selenium.By;
++import org.openqa.selenium.WebElement;
++import org.openqa.selenium.support.ui.ExpectedConditions;
++
++import java.util.List;
++
++/**
++ * Page Object Model for the Reservation Page in the Nazeel system.
++ * This class contains locators and actions related to the Reservation Page.
++ */
++public class P03_Reservation {
++
++    // Locator for the unit cards displayed on the reservation page
++    private final By unitsCards = By.cssSelector("div[class='col-lg-12 pdr-0']>div");
++
++    // Locator for the "Add Reservation" buttons on the unit cards
++    private final By addReservationButtons = By.cssSelector("div[class = 'unit-card__action--primary us-add ng-star-inserted']");
++
++    // Locator for the calendar buttons used for selecting dates
++    private final By calendarButtons = By.cssSelector("div[class='input-group-append']");
++
++    // Locator for the visit purpose dropdown list
++    private final By visitPurposeDropList = By.cssSelector(".col-md-12>kendo-dropdownlist>span[class='k-dropdown-wrap k-state-default']");
++
++    // Locator for the reservation source dropdown list
++    private final By reservationSourceDropList = By.cssSelector(".col-md-5>kendo-dropdownlist>span[class='k-dropdown-wrap k-state-default']");
++
++    // Locator for the visit purpose options displayed in the dropdown
++    private final By visitPurposeOptions = By.cssSelector("div[class='k-list-scroller']>ul>li");
++
++    // Locator for the page title on the new reservation page
++    private final By newReservationPageTitle = By.cssSelector("h2[class = 'page-header__title ng-star-inserted']");
++
++    // Locator for the calendar dialog for date selection
++    private final By calendarDialog = By.cssSelector("div[role='dialog']");
++
++    // Locator for the next month button in the calendar dialog
++    private final By nextMonthButton = By.cssSelector(".p-datepicker-next");
++
++    // Locator for the previous month button in the calendar dialog
++    private final By prevMonthButton = By.cssSelector(".p-datepicker-prev");
++
++    // Locator for the title label showing the calendar month and year
++    private final By calendarDialogTitleLabel = By.cssSelector(".p-datepicker-title>span");
++
++    // Locator for the days displayed in the calendar dialog
++    private final By daysInCalendar = By.cssSelector("table.p-datepicker-calendar td span");
++
++    // Locator for the options in the reservation source dropdown
++    private final By reservationSourceOptions = By.cssSelector("div[class='k-list-scroller']>ul>li[role='option']");
++
++    // Locator for the "Select Guest Now" button
++    private final By selectGuestNowButton = By.cssSelector("button[class='n-button n-button--primary u-m-end-15']");
++
++    // Locator for the search input field for guest ID
++    private final By searchGuestByIDET = By.cssSelector("input[placeholder='ID Number']");
++
++    // Locator for the search button in the guest selection dialog
++    private final By searchGuestButton = By.cssSelector("button[class='button button--primary']");
++
++    // Locator for the dialog displayed for selecting a guest
++    private final By selectGuestDialog = By.cssSelector("div[role='dialog']");
++
++    // Locator for the row displaying a found guest in the selection dialog
++    private final By foundGuestRow = By.cssSelector("#guestFormDialogContainer>kendo-grid>div>kendo-grid-list>div>div>table>tbody[role='presentation']>tr[role='row']");
++
++    // Locator for the confirm button in the search guest dialog
++    private final By confirmSearchButton = By.cssSelector("button[class='n-button n-button--primary ng-star-inserted']");
++
++    // Locator for the "Check In" button
++    private final By checkInButton = By.cssSelector(".u-d-flex.u-mb-15>button.button--green-border");
++
++    // Locator for the confirm button for check-in
++    private final By confirmCheckInButton = By.cssSelector(".m-3.ng-star-inserted>button");
++
++    // Locator for the "Check Out" button
++    private final By checkOutButton = By.cssSelector(".u-d-flex.u-mb-15>button.button--danger-border");
++
++    // Locator for the confirm button for check-out
++    private final By confirmCheckOutButton = By.cssSelector("button[class='n-button n-button--primary']");
++
++    // Locator for the receipt voucher button
++    private final By receiptVoucherButton = By.cssSelector("button[class = 'k-button k-state-active k-group-start']");
++
++    // Locator for the input field to select the payment method
++    private final By paymentMethodInput = By.cssSelector("input[placeholder='Select Payment Method']");
++
++    // Locator for the "Save and Continue" button
++    private final By saveAndContinueButton = By.cssSelector("div.ng-star-inserted>button.button.button--primary.ng-star-inserted");
++
++    // Locator for the success message displayed after a reservation is successfully made
++    private final By reservationSuccessMessage = By.cssSelector("div.toast-success[style='display: block;']>div.toast-message");
++
++    /**
++     * Retrieves a list of WebElements representing the unit cards.
++     *
++     * @return List of WebElements for unit cards.
++     */
++    public List<WebElement> getUnitsCards() {
++        return Hooks.Browser.getDriver().findElements(unitsCards);
++    }
++
++    /**
++     * Retrieves a list of WebElements representing the "Add Reservation" buttons.
++     *
++     * @return List of WebElements for add reservation buttons.
++     */
++    public List<WebElement> getAddReservationButtons() {
++        return Hooks.Browser.getDriver().findElements(addReservationButtons);
++    }
++
++    /**
++     * Retrieves the WebElement for the check-in date button.
++     *
++     * @return WebElement for the check-in date button.
++     */
++    public WebElement getCheckInDateButton() {
++        return Hooks.Browser.getDriver().findElements(calendarButtons).getFirst();
++    }
++
++    /**
++     * Retrieves the WebElement for the check-out date button.
++     *
++     * @return WebElement for the check-out date button.
++     */
++    public WebElement getCheckOutDateButton() {
++        return Hooks.Browser.getDriver().findElements(calendarButtons).get(1);
++    }
++
++    /**
++     * Retrieves the WebElement for the visit purpose dropdown list.
++     *
++     * @return WebElement for the visit purpose dropdown list.
++     */
++    public WebElement getVisitPurposeDropList() {
++        return Hooks.Browser.getDriver().findElement(visitPurposeDropList);
++    }
++
++    /**
++     * Retrieves the WebElement for the reservation source dropdown list.
++     *
++     * @return WebElement for the reservation source dropdown list.
++     */
++    public WebElement getReservationSourceDropList() {
++        return Hooks.Browser.getDriver().findElement(reservationSourceDropList);
++    }
++
++    /**
++     * Retrieves a list of WebElements representing the visit purpose options in the dropdown.
++     *
++     * @return List of WebElements for visit purpose options.
++     */
++    public List<WebElement> getVisitPurposeOptions() {
++        Hooks.Browser.explicitWait(5).until(ExpectedConditions.presenceOfAllElementsLocatedBy(visitPurposeOptions));
++        return Hooks.Browser.getDriver().findElements(visitPurposeOptions);
++    }
++
++    /**
++     * Retrieves the WebElement for the page title on the new reservation page.
++     *
++     * @return WebElement for the new reservation page title.
++     */
++    public WebElement getNewReservationPageTitle() {
++        return Hooks.Browser.getDriver().findElement(newReservationPageTitle);
++    }
++
++    /**
++     * Retrieves the WebElement for the calendar dialog used for date selection.
++     *
++     * @return WebElement for the calendar dialog.
++     */
++    public WebElement getCalenderDialog() {
++        return Hooks.Browser.getDriver().findElement(calendarDialog);
++    }
++
++    /**
++     * Retrieves the WebElement for the month title in the calendar dialog.
++     *
++     * @return WebElement for the calendar dialog month title.
++     */
++    public WebElement getCalendarDialogMonthTitle() {
++        return Hooks.Browser.getDriver().findElements(calendarDialogTitleLabel).getFirst();
++    }
++
++    /**
++     * Retrieves the WebElement for the year title in the calendar dialog.
++     *
++     * @return WebElement for the calendar dialog year title.
++     */
++    public WebElement getCalendarDialogYearTitle() {
++        return Hooks.Browser.getDriver().findElements(calendarDialogTitleLabel).get(1);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Next Month" button in the calendar dialog.
++     *
++     * @return WebElement for the next month button.
++     */
++    public WebElement getNextMonthCalendarDialogButton() {
++        return Hooks.Browser.getDriver().findElement(nextMonthButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Previous Month" button in the calendar dialog.
++     *
++     * @return WebElement for the previous month button.
++     */
++    public WebElement getPrevMonthCalendarDialogButton() {
++        return Hooks.Browser.getDriver().findElement(prevMonthButton);
++    }
++
++    /**
++     * Retrieves a list of WebElements representing the days displayed in the calendar dialog.
++     *
++     * @return List of WebElements for the days in the calendar.
++     */
++    public List<WebElement> getDaysInCalendarDialog() {
++        return Hooks.Browser.getDriver().findElements(daysInCalendar);
++    }
++
++    /**
++     * Retrieves a list of WebElements representing the options in the reservation source dropdown list.
++     *
++     * @return List of WebElements for reservation source options.
++     */
++    public List<WebElement> getReservationSourceOptions() {
++        return Hooks.Browser.getDriver().findElements(reservationSourceOptions);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Select Guest Now" button.
++     *
++     * @return WebElement for the select guest now button.
++     */
++    public WebElement getSelectGuestNowButton() {
++        return Hooks.Browser.getDriver().findElement(selectGuestNowButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the search input field for guest ID.
++     *
++     * @return WebElement for the search guest by ID field.
++     */
++    public WebElement getSearchGuestByIDET() {
++        return Hooks.Browser.getDriver().findElement(searchGuestByIDET);
++    }
++
++    /**
++     * Retrieves the WebElement for the search button in the guest selection dialog.
++     *
++     * @return WebElement for the search guest button.
++     */
++    public WebElement getSearchGuestButton() {
++        return Hooks.Browser.getDriver().findElement(searchGuestButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the guest selection dialog.
++     *
++     * @return WebElement for the guest selection dialog.
++     */
++    public WebElement getSelectGuestNowDialog() {
++        return Hooks.Browser.getDriver().findElement(selectGuestDialog);
++    }
++
++    /**
++     * Retrieves the WebElement for the row displaying a found guest in the selection dialog.
++     *
++     * @return WebElement for the found guest row.
++     */
++    public WebElement getFoundGuestRow() {
++        return Hooks.Browser.getDriver().findElement(foundGuestRow);
++    }
++
++    /**
++     * Retrieves the WebElement for the confirm button in the search guest dialog.
++     *
++     * @return WebElement for the confirm search button.
++     */
++    public WebElement getConfirmSearchButton() {
++        return Hooks.Browser.getDriver().findElement(confirmSearchButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Check In" button.
++     *
++     * @return WebElement for the check-in button.
++     */
++    public WebElement getCheckInButton() {
++        return Hooks.Browser.getDriver().findElement(checkInButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the confirm button for check-in.
++     *
++     * @return WebElement for the confirm check-in button.
++     */
++    public WebElement getConfirmCheckInButton() {
++        return Hooks.Browser.getDriver().findElement(confirmCheckInButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Check Out" button.
++     *
++     * @return WebElement for the check-out button.
++     */
++    public WebElement getCheckOutButton() {
++        return Hooks.Browser.getDriver().findElement(checkOutButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the confirm button for check-out.
++     *
++     * @return WebElement for the confirm check-out button.
++     */
++    public WebElement getConfirmCheckOutButton() {
++        return Hooks.Browser.getDriver().findElement(confirmCheckOutButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the receipt voucher button.
++     *
++     * @return WebElement for the receipt voucher button.
++     */
++    public WebElement getReceiptVoucherButton() {
++        return Hooks.Browser.getDriver().findElement(receiptVoucherButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the input field to select the payment method.
++     *
++     * @return WebElement for the payment method input field.
++     */
++    public WebElement getPaymentMethod() {
++        return Hooks.Browser.getDriver().findElement(paymentMethodInput);
++    }
++
++    /**
++     * Retrieves the WebElement for the "Save and Continue" button.
++     *
++     * @return WebElement for the save and continue button.
++     */
++    public WebElement getSaveAndContinueButton() {
++        return Hooks.Browser.getDriver().findElement(saveAndContinueButton);
++    }
++
++    /**
++     * Retrieves the WebElement for the success message displayed after a reservation is successfully made.
++     *
++     * @return WebElement for the reservation success message.
++     */
++    public WebElement getSuccessfulMessageReservation() {
++        return Hooks.Browser.getDriver().findElement(reservationSuccessMessage);
++    }
++}
+Index: src/test/java/nazeel/testsuites/TS01_Reservation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/testsuites/TS01_Reservation.java b/src/test/java/nazeel/testsuites/TS01_Reservation.java
+new file mode 100644
+--- /dev/null	(date 1737377572657)
++++ b/src/test/java/nazeel/testsuites/TS01_Reservation.java	(date 1737377572657)
+@@ -0,0 +1,128 @@
++package nazeel.testsuites;
++
++import nazeel.Hooks;
++import nazeel.actions.A01_Login;
++import nazeel.actions.A02_Home;
++import nazeel.actions.A03_Reservation;
++import org.testng.Assert;
++import org.testng.annotations.BeforeMethod;
++import org.testng.annotations.Test;
++
++import java.time.Duration;
++import java.time.LocalDate;
++import java.time.format.DateTimeFormatter;
++
++/**
++ * Test Suite for Reservation functionality in the Nazeel system.
++ * This class contains test cases to validate reservation operations such as check-in and check-out.
++ */
++public class TS01_Reservation extends Hooks {
++
++    // Action classes for performing actions on Login, Home, and Reservation pages
++    private final A01_Login loginActions = new A01_Login(); // Handles login-related actions
++    private final A02_Home homeActions = new A02_Home(); // Handles home page-related actions
++    private final A03_Reservation reservationActions = new A03_Reservation(); // Handles reservation-related actions
++
++    /**
++     * Navigates to the login page before each test method.
++     * Ensures that the browser starts at the login page before any test begins.
++     */
++    @BeforeMethod
++    public void navigateToLogin() {
++        loginActions.open(); // Opens the login page
++    }
++
++    /**
++     * Test Case: Validate that the reservation can be checked out successfully.
++     * <p>
++     * This test performs the following steps:
++     * - Logs into the system using valid credentials.
++     * - Navigates to the reservations section.
++     * - Performs a reservation and checks out successfully.
++     * - Verifies that the success message is displayed after the check-out process.
++     */
++    @Test(testName = "TC01 :: Reservation CheckedOut successfully!",
++            suiteName = "Reservation",
++            description = "Validate that the reservation is checked-Out successfully")
++    public void tc01_ValidateReservation() {
++        // Formatter for date fields used during the reservation process
++        DateTimeFormatter checkInOutDatesFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
++
++        // Step 1: Log in with valid credentials
++        loginActions.enterUsername("Mahmoud Gamal") // Enter username
++                .enterPassword("123456Mm&&") // Enter password
++                .enterAccessCode("01373") // Enter access code
++                .clickLogin(); // Submit the login form
++
++        // Step 2: Wait for the first property to be displayed and select it
++        Hooks.Browser.explicitWait(5).until(driver -> loginActions.isPropertyTestOneDisplayed());
++        loginActions.clickPropertyTestOne(); // Click "Test One" property
++
++        // Step 3: Handle the User Verification popup and navigate to the Reservations tab
++        Hooks.Browser.explicitWait(10).until(driver -> homeActions.isLaterButtonDisplayed());
++        Hooks.Browser.implicitWait(3); // Add implicit wait for stability
++        homeActions.clickLaterButton() // Dismiss verification popup
++                .selectReservationsTab(); // Navigate to the reservations page
++
++        // Step 4: Wait for unit cards to load and hover over a random card
++        Hooks.Browser.explicitWait(10).until(driver -> reservationActions.isUnitsCardsDisplayed());
++        int hoveredCardNum = reservationActions.hoverRandomCard(); // Hover over a random unit card
++
++        // Step 5: Click the "Add Reservation" button for the selected card
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isAddReservationButtonDisplayed(hoveredCardNum));
++        reservationActions.clickAddReservationButton(hoveredCardNum); // Open the reservation form
++
++        // Step 6: Enter Check-In and Check-Out dates
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isNewReservationPageTitleDisplayed());
++        reservationActions.enterCheckInDate(LocalDate.now().minusDays(2).format(checkInOutDatesFormatter)); // Check-In: Today - 2
++
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isCheckOutDateDisplayed());
++        reservationActions.enterCheckOutDate(LocalDate.now().plusDays(1).format(checkInOutDatesFormatter)) // Check-Out: Today + 1
++                .clickVisitPurposeDropList(); // Open Visit Purpose dropdown
++
++        // Step 7: Select Visit Purpose and Reservation Source options
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isVisitPurposeOptionsDisplayed());
++        reservationActions.selectRandomVisitPurposeOptions(); // Select a random Visit Purpose
++
++        reservationActions.clickReservationSourceDropList(); // Open Reservation Source dropdown
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isReservationSourceOptionsDisplayed());
++        reservationActions.selectRandomReservationSourceOptions() // Select a random Reservation Source
++                .clickSelectGuestNowButton(); // Open guest selection popup
++
++        // Step 8: Search for a guest and confirm selection
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isNewGuestDialogDisplayed());
++        reservationActions.enterSearchGuestID("123456789") // Enter Guest ID
++                .clickSearchGuestButton() // Search for the guest
++                .selectAndHoverFoundGuest() // Hover over the search result
++                .clickConfirmSearchButton() // Confirm the selected guest
++                .clickCheckInButton(); // Finalize the reservation check-in
++
++        // Step 9: Confirm Check-In
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isConfirmCheckInButtonDisplayed());
++        reservationActions.clickConfirmCheckInButton(); // Confirm Check-In action
++
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isCheckOutButtonDisplayed());
++        reservationActions.clickCheckOutButton(); // Proceed to Check-Out
++
++        // Step 10: Confirm Check-Out and complete payment
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isConfirmCheckOutButtonDisplayed());
++        reservationActions.clickConfirmCheckOutButton() // Confirm Check-Out action
++                .clickReceiptVoucherButton() // Add receipt voucher
++                .enterPaymentMethod("Cash"); // Select payment method as Cash
++
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isSaveAndContinueButtonDisplayed());
++        reservationActions.clickSaveAndContinueButton(); // Save and complete the transaction
++
++        // Step 11: Validate the success message
++        Hooks.Browser.explicitWait(5).until(driver -> reservationActions.isSuccessfulMessageDisplayed());
++        Assert.assertTrue(reservationActions.getSuccessfulMessageText().toLowerCase().contains("successfully"),
++                "Success message not displayed within timeout"); // Assertion for success message
++
++        // Optional: Pause execution for observation
++        try {
++            Thread.sleep(Duration.ofSeconds(10)); // Pause for 10 seconds
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e); // Handle interruption exception
++        }
++    }
++}
+Index: src/test/java/nazeel/actions/A03_Reservation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/actions/A03_Reservation.java b/src/test/java/nazeel/actions/A03_Reservation.java
+new file mode 100644
+--- /dev/null	(date 1737376354673)
++++ b/src/test/java/nazeel/actions/A03_Reservation.java	(date 1737376354673)
+@@ -0,0 +1,467 @@
++package nazeel.actions;
++
++import nazeel.Hooks;
++import nazeel.pages.P03_Reservation;
++import org.openqa.selenium.Keys;
++import org.openqa.selenium.WebElement;
++import org.openqa.selenium.interactions.Actions;
++
++import java.time.Duration;
++import java.util.List;
++import java.util.Random;
++
++/**
++ * Action Class for the Reservation Page in the Nazeel system.
++ * This class contains methods to perform user actions on the Reservation Page.
++ */
++public class A03_Reservation {
++    // Instance of the P03_Reservation class to access page elements
++    P03_Reservation reservationPage = new P03_Reservation();
++
++    /**
++     * Checks if the unit cards are displayed on the Reservation Page.
++     *
++     * @return true if unit cards are displayed, false otherwise.
++     */
++    public boolean isUnitsCardsDisplayed() {
++        if (!reservationPage.getUnitsCards().isEmpty())
++            return reservationPage.getUnitsCards().getFirst().isDisplayed();
++        else
++            return false;
++    }
++
++    /**
++     * Hovers over a randomly selected unit card.
++     *
++     * @return The index of the hovered unit card.
++     */
++    public int hoverRandomCard() {
++        // Get the list of unit cards
++        List<WebElement> cards = reservationPage.getUnitsCards();
++
++        // Check if the list is empty
++        if (cards.isEmpty()) {
++            throw new RuntimeException("No unit cards found to hover over.");
++        }
++
++        // Generate a random number within the range of the cards list
++        int randomCardNumber = new Random().nextInt(reservationPage.getAddReservationButtons().size());
++
++        // Get the card corresponding to the random number
++        WebElement randomCard = cards.get(randomCardNumber);
++
++        // Perform a hover action using the Actions class
++        Actions actions = new Actions(Hooks.Browser.getDriver());
++        actions.moveToElement(randomCard).perform();
++
++        return randomCardNumber;
++    }
++
++    /**
++     * Checks if the "Add Reservation" button for the specified card is displayed.
++     *
++     * @param indexOfHoveredCard The index of the card to check.
++     * @return true if the button is displayed, false otherwise.
++     */
++    public boolean isAddReservationButtonDisplayed(int indexOfHoveredCard) {
++        return reservationPage.getAddReservationButtons().get(indexOfHoveredCard).isDisplayed();
++    }
++
++    /**
++     * Clicks the "Add Reservation" button for the specified card.
++     *
++     * @param indexOfHoveredCard The index of the card to click the button for.
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickAddReservationButton(int indexOfHoveredCard) {
++        reservationPage.getAddReservationButtons().get(indexOfHoveredCard).click();
++        return this;
++    }
++
++    /**
++     * Clicks the "Next Month" button in the calendar dialog.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickNextMonthCalenderDialogButton() {
++        reservationPage.getNextMonthCalendarDialogButton().click();
++        return this;
++    }
++
++    /**
++     * Clicks the "Previous Month" button in the calendar dialog.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickPrevMonthCalenderDialogButton() {
++        reservationPage.getPrevMonthCalendarDialogButton().click();
++        return this;
++    }
++
++    /**
++     * Converts a month name to its corresponding number.
++     *
++     * @param monthName The name of the month.
++     * @return The month number as a string.
++     */
++    private String convertMonthNameToNumber(String monthName) {
++        return switch (monthName.toLowerCase()) {
++            case "january" -> "01";
++            case "february" -> "02";
++            case "march" -> "03";
++            case "april" -> "04";
++            case "may" -> "05";
++            case "june" -> "06";
++            case "july" -> "07";
++            case "august" -> "08";
++            case "september" -> "09";
++            case "october" -> "10";
++            case "november" -> "11";
++            case "december" -> "12";
++            default -> throw new IllegalArgumentException("Invalid month name: " + monthName);
++        };
++    }
++
++    /**
++     * Selects a specific date from the calendar dialog.
++     *
++     * @param targetDate The date to select in the format "dd/MM/yyyy".
++     */
++    public void selectDateFromCalendar(String targetDate) {
++        // Split the date into day, month, and year
++        String[] dateParts = targetDate.split("/");
++        String day = dateParts[0];
++        String month = dateParts[1]; // Use as month number
++        String year = dateParts[2];
++
++        // Wait until the calendar is visible
++        Hooks.Browser.explicitWait(2).until(driver -> reservationPage.getCalenderDialog().isDisplayed());
++
++        // Navigate to the correct year and month
++        while (true) {
++            // Get the currently displayed month and year
++            String displayedYear = reservationPage.getCalendarDialogYearTitle().getText();
++            String displayedMonthName = reservationPage.getCalendarDialogMonthTitle().getText();
++            String displayedMonth = convertMonthNameToNumber(displayedMonthName);
++
++            // Stop if the current month and year match the target
++            if (displayedYear.equals(year) && displayedMonth.equals(month)) {
++                break;
++            }
++
++            // Navigate forward or backward
++            if (Integer.parseInt(displayedYear) < Integer.parseInt(year) ||
++                    (displayedYear.equals(year) && Integer.parseInt(displayedMonth) < Integer.parseInt(month))) {
++                clickNextMonthCalenderDialogButton();
++            } else {
++                clickPrevMonthCalenderDialogButton();
++            }
++        }
++
++        // Select the correct day
++        for (WebElement dayElement : reservationPage.getDaysInCalendarDialog()) {
++            if (dayElement.getText().trim().equals(day)) {
++                dayElement.click();
++                break;
++            }
++        }
++    }
++
++    /**
++     * Enters a check-in date using the calendar dialog.
++     *
++     * @param checkInDate The check-in date in the format "dd/MM/yyyy".
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation enterCheckInDate(String checkInDate) {
++        try {
++            Thread.sleep(Duration.ofSeconds(2));
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        reservationPage.getCheckInDateButton().click(); // Open the calendar
++        selectDateFromCalendar(checkInDate); // Select the desired date
++        return this;
++    }
++
++    /**
++     * Checks if the check-out date button is displayed.
++     *
++     * @return true if the check-out date button is displayed, false otherwise.
++     */
++    public boolean isCheckOutDateDisplayed() {
++        return reservationPage.getCheckOutDateButton().isDisplayed();
++    }
++
++    /**
++     * Enters a check-out date using the calendar dialog.
++     *
++     * @param checkOutDate The check-out date in the format "dd/MM/yyyy".
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation enterCheckOutDate(String checkOutDate) {
++        reservationPage.getCheckOutDateButton().click(); // Open the calendar
++        selectDateFromCalendar(checkOutDate); // Select the desired date
++        return this;
++    }
++
++    /**
++     * Clicks the dropdown list for selecting the visit purpose.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickVisitPurposeDropList() {
++        reservationPage.getVisitPurposeDropList().click();
++        return this;
++    }
++
++    /**
++     * Clicks the dropdown list for selecting the reservation source.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickReservationSourceDropList() {
++        reservationPage.getReservationSourceDropList().click();
++        return this;
++    }
++
++    /**
++     * Checks if the options for visit purpose are displayed.
++     *
++     * @return true if the options are displayed, false otherwise.
++     */
++    public boolean isVisitPurposeOptionsDisplayed() {
++        return reservationPage.getVisitPurposeOptions().getFirst().isDisplayed();
++    }
++
++    /**
++     * Checks if the options for reservation source are displayed.
++     *
++     * @return true if the options are displayed, false otherwise.
++     */
++    public boolean isReservationSourceOptionsDisplayed() {
++        return reservationPage.getReservationSourceOptions().getFirst().isDisplayed();
++    }
++
++    /**
++     * Selects a random option from the visit purpose dropdown list.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation selectRandomVisitPurposeOptions() {
++        List<WebElement> visitPurposeOptions = reservationPage.getVisitPurposeOptions();
++        int randomOptionNumber = new Random().nextInt(visitPurposeOptions.size());
++        visitPurposeOptions.get(randomOptionNumber).click();
++        return this;
++    }
++
++    /**
++     * Selects a random option from the reservation source dropdown list.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation selectRandomReservationSourceOptions() {
++        List<WebElement> reservationSourceOptions = reservationPage.getReservationSourceOptions();
++        int randomOptionNumber = new Random().nextInt(reservationSourceOptions.size());
++        reservationSourceOptions.get(randomOptionNumber).click();
++        return this;
++    }
++
++    /**
++     * Checks if the title of the new reservation page is displayed.
++     *
++     * @return true if the title is displayed, false otherwise.
++     */
++    public boolean isNewReservationPageTitleDisplayed() {
++        return reservationPage.getNewReservationPageTitle().isDisplayed();
++    }
++
++    /**
++     * Clicks the "Select Guest Now" button on the reservation page.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickSelectGuestNowButton() {
++        reservationPage.getSelectGuestNowButton().click();
++        return this;
++    }
++
++    /**
++     * Enters the guest ID into the search field.
++     *
++     * @param id The guest ID to enter.
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation enterSearchGuestID(String id) {
++        reservationPage.getSearchGuestByIDET().sendKeys(id);
++        return this;
++    }
++
++    /**
++     * Clicks the button to search for a guest by ID.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickSearchGuestButton() {
++        reservationPage.getSearchGuestButton().click();
++        return this;
++    }
++
++    /**
++     * Checks if the new guest dialog is displayed.
++     *
++     * @return true if the dialog is displayed, false otherwise.
++     */
++    public boolean isNewGuestDialogDisplayed() {
++        return reservationPage.getSelectGuestNowDialog().isDisplayed();
++    }
++
++    /**
++     * Selects and hovers over a found guest in the dialog.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation selectAndHoverFoundGuest() {
++        WebElement foundGuest = reservationPage.getFoundGuestRow();
++        // Perform a hover action using the Actions class
++        Actions actions = new Actions(Hooks.Browser.getDriver());
++        actions.moveToElement(foundGuest).perform();
++        foundGuest.click();
++        return this;
++    }
++
++    /**
++     * Clicks the confirm button in the guest search dialog.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickConfirmSearchButton() {
++        reservationPage.getConfirmSearchButton().click();
++        return this;
++    }
++
++    /**
++     * Clicks the "Check In" button on the reservation page.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickCheckInButton() {
++        reservationPage.getCheckInButton().click();
++        return this;
++    }
++
++    /**
++     * Checks if the confirm button for check-in is displayed.
++     *
++     * @return true if the button is displayed, false otherwise.
++     */
++    public boolean isConfirmCheckInButtonDisplayed() {
++        return reservationPage.getConfirmCheckInButton().isDisplayed();
++    }
++
++    /**
++     * Clicks the confirm button for check-in.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickConfirmCheckInButton() {
++        reservationPage.getConfirmCheckInButton().click();
++        return this;
++    }
++
++    /**
++     * Checks if the button for check-out is displayed.
++     *
++     * @return true if the button is displayed, false otherwise.
++     */
++    public boolean isCheckOutButtonDisplayed() {
++        return reservationPage.getCheckOutButton().isDisplayed();
++    }
++
++    /**
++     * Clicks the "Check Out" button on the reservation page.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickCheckOutButton() {
++        reservationPage.getCheckOutButton().click();
++        return this;
++    }
++
++    /**
++     * Checks if the confirm button for check-out is displayed.
++     *
++     * @return true if the button is displayed, false otherwise.
++     */
++    public boolean isConfirmCheckOutButtonDisplayed() {
++        return reservationPage.getConfirmCheckOutButton().isDisplayed();
++    }
++
++    /**
++     * Clicks the confirm button for check-out.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickConfirmCheckOutButton() {
++        reservationPage.getConfirmCheckOutButton().click();
++        return this;
++    }
++
++    /**
++     * Clicks the receipt voucher button on the reservation page.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickReceiptVoucherButton() {
++        reservationPage.getReceiptVoucherButton().click();
++        return this;
++    }
++
++    /**
++     * Enters the payment method into the appropriate input field.
++     *
++     * @param paymentMethod The payment method to enter.
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation enterPaymentMethod(String paymentMethod) {
++        reservationPage.getPaymentMethod().sendKeys(paymentMethod + Keys.ENTER);
++        return this;
++    }
++
++    /**
++     * Checks if the save and continue button is displayed.
++     *
++     * @return true if the save and continue button is displayed, false otherwise.
++     */
++    public boolean isSaveAndContinueButtonDisplayed() {
++        return reservationPage.getSaveAndContinueButton().isDisplayed();
++    }
++
++    /**
++     * Clicks the "Save and Continue" button on the reservation page.
++     *
++     * @return The current A03_Reservation instance for method chaining.
++     */
++    public A03_Reservation clickSaveAndContinueButton() {
++        reservationPage.getSaveAndContinueButton().click();
++        return this;
++    }
++
++    /**
++     * Checks if the success message for a successful reservation is displayed.
++     *
++     * @return true if the success message is displayed, false otherwise.
++     */
++    public boolean isSuccessfulMessageDisplayed() {
++        return reservationPage.getSuccessfulMessageReservation().isDisplayed();
++    }
++
++    /**
++     * Returns text of the success message for a successful reservation.
++     *
++     * @return text of the success message.
++     */
++    public String getSuccessfulMessageText() {
++        return reservationPage.getSuccessfulMessageReservation().getText();
++    }
++}
+\ No newline at end of file
+Index: src/test/java/nazeel/pages/P01_Login.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/pages/P01_Login.java b/src/test/java/nazeel/pages/P01_Login.java
+new file mode 100644
+--- /dev/null	(date 1737374445806)
++++ b/src/test/java/nazeel/pages/P01_Login.java	(date 1737374445806)
+@@ -0,0 +1,66 @@
++package nazeel.pages;
++
++import nazeel.Hooks;
++import org.openqa.selenium.By;
++import org.openqa.selenium.WebElement;
++
++/**
++ * Page Object Model for the Login Page in the Nazeel system.
++ * This class contains locators and actions related to the Login Page.
++ */
++public class P01_Login {
++    // URL of the login page
++    public static final String URL = "https://staging.nazeel.net:9002/login";
++
++    // Locators for the login page elements
++    private final By usernameField = By.id("usern"); // Username input field
++    private final By passwordField = By.id("pass"); // Password input field
++    private final By accessCodeField = By.id("acc"); // Access code input field
++    private final By loginButton = By.cssSelector("button[class='n-button n-button--primary n-button--full-width u-mb-24 ng-star-inserted']"); // Login button
++    private final By propertyTestOneSelection = By.cssSelector("tbody[role='presentation']>tr:nth-child(2)");
++
++    /**
++     * Gets the WebElement for the username input field.
++     *
++     * @return WebElement representing the username input field.
++     */
++    public WebElement getUsernameET() {
++        return Hooks.Browser.getDriver().findElement(usernameField);
++    }
++
++    /**
++     * Gets the WebElement for the password input field.
++     *
++     * @return WebElement representing the password input field.
++     */
++    public WebElement getPasswordET() {
++        return Hooks.Browser.getDriver().findElement(passwordField);
++    }
++
++    /**
++     * Gets the WebElement for the access code input field.
++     *
++     * @return WebElement representing the access code input field.
++     */
++    public WebElement getAccessCodeET() {
++        return Hooks.Browser.getDriver().findElement(accessCodeField);
++    }
++
++    /**
++     * Gets the WebElement for the login button.
++     *
++     * @return WebElement representing the login button.
++     */
++    public WebElement getLoginButton() {
++        return Hooks.Browser.getDriver().findElement(loginButton);
++    }
++
++    /**
++     * Gets the WebElement for the property test one selection.
++     *
++     * @return WebElement representing the property test one selection.
++     */
++    public WebElement getPropertyTestOne() {
++        return Hooks.Browser.getDriver().findElement(propertyTestOneSelection);
++    }
++}
+Index: src/test/java/nazeel/pages/P02_Home.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/pages/P02_Home.java b/src/test/java/nazeel/pages/P02_Home.java
+new file mode 100644
+--- /dev/null	(date 1737374481803)
++++ b/src/test/java/nazeel/pages/P02_Home.java	(date 1737374481803)
+@@ -0,0 +1,35 @@
++package nazeel.pages;
++
++import nazeel.Hooks;
++import org.openqa.selenium.By;
++import org.openqa.selenium.WebElement;
++
++/**
++ * Page Object Model for the Home Page in the Nazeel system.
++ * This class contains locators and actions related to the Home Page.
++ */
++public class P02_Home {
++    // Locator for the "Later" button displayed on the Home Page
++    private final By laterButton = By.className("n-button--primary-border");
++
++    // Locator for the Reservations tab in the navigation menu
++    private final By reservationsTab = By.cssSelector("a[href='/reservations']");
++
++    /**
++     * Gets the WebElement for the "Later" button.
++     *
++     * @return WebElement representing the "Later" button.
++     */
++    public WebElement getLaterButton() {
++        return Hooks.Browser.getDriver().findElement(laterButton);
++    }
++
++    /**
++     * Gets the WebElement for the Reservations tab.
++     *
++     * @return WebElement representing the Reservations tab.
++     */
++    public WebElement getReservationsTab() {
++        return Hooks.Browser.getDriver().findElement(reservationsTab);
++    }
++}
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" default=\"true\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
++++ b/.idea/misc.xml	(date 1737068920254)
+@@ -1,6 +1,15 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="ProjectRootManager" version="2" default="true">
++  <component name="ExternalStorageConfigurationManager" enabled="true" />
++  <component name="MavenProjectsManager">
++    <option name="originalFiles">
++      <list>
++        <option value="$PROJECT_DIR$/pom.xml" />
++      </list>
++    </option>
++    <option name="workspaceImportForciblyTurnedOn" value="true" />
++  </component>
++  <component name="ProjectRootManager" version="2" default="true" project-jdk-name="23" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: src/test/java/nazeel/actions/A01_Login.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/actions/A01_Login.java b/src/test/java/nazeel/actions/A01_Login.java
+new file mode 100644
+--- /dev/null	(date 1737374727867)
++++ b/src/test/java/nazeel/actions/A01_Login.java	(date 1737374727867)
+@@ -0,0 +1,79 @@
++package nazeel.actions;
++
++import nazeel.Hooks;
++import nazeel.pages.P01_Login;
++
++/**
++ * Action Class for the Login Page in the Nazeel system.
++ * This class contains methods to perform user actions on the Login Page.
++ */
++public class A01_Login {
++    // Instance of the P01_Login class to access page elements
++    P01_Login loginPage = new P01_Login();
++
++    /**
++     * Enters the username in the username field.
++     *
++     * @param username The username to enter.
++     * @return The current A01_Login instance for method chaining.
++     */
++    public A01_Login enterUsername(String username) {
++        loginPage.getUsernameET().sendKeys(username);
++        return this;
++    }
++
++    /**
++     * Enters the password in the password field.
++     *
++     * @param password The password to enter.
++     * @return The current A01_Login instance for method chaining.
++     */
++    public A01_Login enterPassword(String password) {
++        loginPage.getPasswordET().sendKeys(password);
++        return this;
++    }
++
++    /**
++     * Enters the access code in the access code field.
++     *
++     * @param accessCode The access code to enter.
++     * @return The current A01_Login instance for method chaining.
++     */
++    public A01_Login enterAccessCode(String accessCode) {
++        loginPage.getAccessCodeET().sendKeys(accessCode);
++        return this;
++    }
++
++    /**
++     * Clicks the login button to submit the login form.
++     *
++     * @return The current A01_Login instance for method chaining.
++     */
++    public A01_Login clickLogin() {
++        loginPage.getLoginButton().click();
++        return this;
++    }
++
++    /**
++     * Opens the login page by navigating to its URL.
++     */
++    public void open() {
++        Hooks.Browser.getDriver().get(P01_Login.URL);
++    }
++
++    /**
++     * Checks if the first property test element is displayed on the page.
++     *
++     * @return true if the property test element is displayed, false otherwise.
++     */
++    public boolean isPropertyTestOneDisplayed() {
++        return loginPage.getPropertyTestOne().isDisplayed();
++    }
++
++    /**
++     * Clicks on the first property test element on the page.
++     */
++    public void clickPropertyTestOne() {
++        loginPage.getPropertyTestOne().click();
++    }
++}
+\ No newline at end of file
+Index: src/test/java/nazeel/actions/A02_Home.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/nazeel/actions/A02_Home.java b/src/test/java/nazeel/actions/A02_Home.java
+new file mode 100644
+--- /dev/null	(date 1737374765992)
++++ b/src/test/java/nazeel/actions/A02_Home.java	(date 1737374765992)
+@@ -0,0 +1,41 @@
++package nazeel.actions;
++
++import nazeel.pages.P02_Home;
++
++/**
++ * Action Class for the Home Page in the Nazeel system.
++ * This class contains methods to perform user actions on the Home Page.
++ */
++public class A02_Home {
++    // Instance of the P02_Home class to access page elements
++    P02_Home homePage = new P02_Home();
++
++    /**
++     * Checks if the "Later" button is displayed on the Home Page.
++     *
++     * @return true if the "Later" button is displayed, false otherwise.
++     */
++    public boolean isLaterButtonDisplayed() {
++        return homePage.getLaterButton().isDisplayed();
++    }
++
++    /**
++     * Clicks the "Later" button on the Home Page.
++     *
++     * @return The current A02_Home instance for method chaining.
++     */
++    public A02_Home clickLaterButton() {
++        homePage.getLaterButton().click();
++        return this;
++    }
++
++    /**
++     * Selects the Reservations tab from the navigation menu on the Home Page.
++     *
++     * @return The current A02_Home instance for method chaining.
++     */
++    public A02_Home selectReservationsTab() {
++        homePage.getReservationsTab().click();
++        return this;
++    }
++}
+\ No newline at end of file
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+new file mode 100644
+--- /dev/null	(date 1737234576836)
++++ b/pom.xml	(date 1737234576836)
+@@ -0,0 +1,40 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xmlns="http://maven.apache.org/POM/4.0.0"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++
++    <groupId>nazeel</groupId>
++    <artifactId>nazeel_automation_test</artifactId>
++    <version>1.0-SNAPSHOT</version>
++    <dependencies>
++        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
++        <dependency>
++            <groupId>org.seleniumhq.selenium</groupId>
++            <artifactId>selenium-java</artifactId>
++            <version>4.27.0</version>
++        </dependency>
++
++
++        <!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
++        <dependency>
++            <groupId>io.github.bonigarcia</groupId>
++            <artifactId>webdrivermanager</artifactId>
++            <version>5.9.2</version>
++        </dependency>
++
++        <dependency>
++            <groupId>org.testng</groupId>
++            <artifactId>testng</artifactId>
++            <version>7.10.2</version>
++            <scope>test</scope>
++        </dependency>
++
++    </dependencies>
++    <properties>
++        <maven.compiler.source>21</maven.compiler.source>
++        <maven.compiler.target>21</maven.compiler.target>
++        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
++    </properties>
++
++</project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"5e19b5d4-d4b5-4d92-8af5-2659daeed516\" name=\"Changes\" comment=\"[ADD] Repository basic files\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"master\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 5\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2rj1QDsemoL605JRHbS6L8UYmEQ\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;\r\n  }\r\n}</component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"d145c5c7-f968-40dd-a568-96fd6aaddbaa\" name=\"Changes\" comment=\"\" />\r\n      <created>1737057522674</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1737057522674</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"[ADD] Repository basic files\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1737057696993</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1737057696993</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"2\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"[ADD] Repository basic files\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"[ADD] Repository basic files\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
++++ b/.idea/workspace.xml	(date 1737290118048)
+@@ -4,16 +4,38 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files" />
++    <list default="true" id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files">
++      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/Hooks.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A01_Login.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A02_Home.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A03_Reservation.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P01_Login.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P02_Home.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P03_Reservation.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/testsuites/TS01_Reservation.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/nazeel_automation_test.iml" beforeDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="FileTemplateManagerImpl">
++    <option name="RECENT_TEMPLATES">
++      <list>
++        <option value="Class" />
++      </list>
++    </option>
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_BRANCH_BY_REPOSITORY">
+       <map>
+-        <entry key="$PROJECT_DIR$" value="master" />
++        <entry key="$PROJECT_DIR$" value="main" />
+       </map>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+@@ -22,7 +44,9 @@
+   &quot;associatedIndex&quot;: 5
+ }</component>
+   <component name="ProjectId" id="2rj1QDsemoL605JRHbS6L8UYmEQ" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
++  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+@@ -31,14 +55,60 @@
+   &quot;keyToString&quot;: {
+     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;TestNG.TS01_Reservation.executor&quot;: &quot;Run&quot;,
++    &quot;TestNG.TS01_Reservation.tc01_ValidateReservation.executor&quot;: &quot;Run&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+   }
+ }</component>
++  <component name="RunManager" selected="TestNG.TS01_Reservation.tc01_ValidateReservation">
++    <configuration name="TS01_Reservation" type="TestNG" temporary="true" nameIsGenerated="true">
++      <module name="nazeel_automation_test" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="nazeel.testsuites.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <option name="PACKAGE_NAME" value="nazeel.testsuites" />
++      <option name="MAIN_CLASS_NAME" value="nazeel.testsuites.TS01_Reservation" />
++      <option name="TEST_OBJECT" value="CLASS" />
++      <properties />
++      <listeners />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <configuration name="TS01_Reservation.tc01_ValidateReservation" type="TestNG" temporary="true" nameIsGenerated="true">
++      <module name="nazeel_automation_test" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="nazeel.testsuites.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <option name="PACKAGE_NAME" value="nazeel.testsuites" />
++      <option name="MAIN_CLASS_NAME" value="nazeel.testsuites.TS01_Reservation" />
++      <option name="METHOD_NAME" value="tc01_ValidateReservation" />
++      <option name="TEST_OBJECT" value="METHOD" />
++      <properties />
++      <listeners />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <recent_temporary>
++      <list>
++        <item itemvalue="TestNG.TS01_Reservation.tc01_ValidateReservation" />
++        <item itemvalue="TestNG.TS01_Reservation" />
++      </list>
++    </recent_temporary>
++  </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+-      <changelist id="d145c5c7-f968-40dd-a568-96fd6aaddbaa" name="Changes" comment="" />
++      <changelist id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files" />
+       <created>1737057522674</created>
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+@@ -52,7 +122,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1737057696993</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="[ADD] Repository basic files">
++      <option name="closed" value="true" />
++      <created>1737058684927</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1737058684927</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <annotationProcessing>\r\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\r\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\r\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\r\n        <outputRelativeToContentRoot value=\"true\" />\r\n        <module name=\"nazeel_automation_test\" />\r\n      </profile>\r\n    </annotationProcessing>\r\n    <bytecodeTargetLevel>\r\n      <module name=\"nazeel_automation_test\" target=\"21\" />\r\n    </bytecodeTargetLevel>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision 0310c04abd8616b43425a5b8582365abddd65af7)
++++ b/.idea/compiler.xml	(date 1737068920260)
+@@ -9,8 +9,5 @@
+         <module name="nazeel_automation_test" />
+       </profile>
+     </annotationProcessing>
+-    <bytecodeTargetLevel>
+-      <module name="nazeel_automation_test" target="21" />
+-    </bytecodeTargetLevel>
+   </component>
+ </project>
+\ No newline at end of file
