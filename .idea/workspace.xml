@@ -4,16 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files" />
+    <list default="true" id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files">
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/Hooks.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A01_Login.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A02_Home.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/actions/A03_Reservation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P01_Login.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P02_Home.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/pages/P03_Reservation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/nazeel/testsuites/TS01_Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nazeel_automation_test.iml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -22,7 +44,9 @@
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="2rj1QDsemoL605JRHbS6L8UYmEQ" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -31,14 +55,60 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;TestNG.TS01_Reservation.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TS01_Reservation.tc01_ValidateReservation.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
 }</component>
+  <component name="RunManager" selected="TestNG.TS01_Reservation.tc01_ValidateReservation">
+    <configuration name="TS01_Reservation" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="nazeel_automation_test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="nazeel.testsuites.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="nazeel.testsuites" />
+      <option name="MAIN_CLASS_NAME" value="nazeel.testsuites.TS01_Reservation" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TS01_Reservation.tc01_ValidateReservation" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="nazeel_automation_test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="nazeel.testsuites.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="nazeel.testsuites" />
+      <option name="MAIN_CLASS_NAME" value="nazeel.testsuites.TS01_Reservation" />
+      <option name="METHOD_NAME" value="tc01_ValidateReservation" />
+      <option name="TEST_OBJECT" value="METHOD" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="TestNG.TS01_Reservation.tc01_ValidateReservation" />
+        <item itemvalue="TestNG.TS01_Reservation" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="d145c5c7-f968-40dd-a568-96fd6aaddbaa" name="Changes" comment="" />
+      <changelist id="5e19b5d4-d4b5-4d92-8af5-2659daeed516" name="Changes" comment="[ADD] Repository basic files" />
       <created>1737057522674</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -52,7 +122,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737057696993</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="[ADD] Repository basic files">
+      <option name="closed" value="true" />
+      <created>1737058684927</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1737058684927</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -9,8 +9,5 @@
         <module name="nazeel_automation_test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="nazeel_automation_test" target="21" />
-    </bytecodeTargetLevel>
   </component>
 </project>
